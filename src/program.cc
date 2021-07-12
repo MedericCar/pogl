@@ -1,6 +1,15 @@
 #include "program.hh"
 
-namespace program
+#define TEST_OPENGL_ERROR()                                                             \
+  do {                                                                                  \
+    GLenum err = glGetError();                                                          \
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL ERROR: "                               \
+                                      << gluErrorString(err)                            \
+                                      << " file " << __FILE__                           \
+                                      << " line " << __LINE__ << std::endl;             \
+  } while(0)
+
+namespace pogl
 {
 
   //Loads shader from file
@@ -15,7 +24,7 @@ namespace program
       std::string line{};
 
       while (getline(in, line))
-	data += line + '\n';
+	      data += line + '\n';
 
       in.close();
 
@@ -35,7 +44,7 @@ namespace program
     //Load and compile shaders
     instance->vertex_shader =
       load_and_compile(GL_VERTEX_SHADER, vertex_shader_src);
-    instance->vertex_shader =
+    instance->fragment_shader =
       load_and_compile(GL_FRAGMENT_SHADER, fragment_shader_src);
 
     //Create program and attach shaders
@@ -54,7 +63,7 @@ namespace program
     //const GLchar* shader_array[1];//malloc(sizeof(GLchar*));
     const GLchar* source = data.c_str();
 
-    glShaderSource(shader, 1, &source, 0);
+    glShaderSource(shader, 1, &source, NULL);
 
     //Compiling shader
     glCompileShader(shader);
@@ -66,7 +75,6 @@ namespace program
     {
       GLint maxLength = 0;
       glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
-
 
       //MaxLength includes the NULL character
       std::vector<GLchar> errorLog(maxLength);
@@ -112,16 +120,13 @@ namespace program
       //Delete program
       glDeleteProgram(id);
       
-      //Delete shaders
-      glDeleteShader(vertex_shader);
-      glDeleteShader(fragment_shader);
-
       errx(1, "Error creating program: %s", std::string(infoLog.begin(),
 	    infoLog.end()).c_str());
     }
 
-    glDetachShader(id, vertex_shader);
-    glDetachShader(id, fragment_shader);
+    //Delete shaders
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
   }
 
   void program::use()

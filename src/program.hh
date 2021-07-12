@@ -7,7 +7,7 @@
 #include <vector>
 #include <err.h>
 
-namespace program
+namespace pogl
 {
 
 class program
@@ -25,13 +25,15 @@ class program
     }
 
     static program *make_program(std::string& vertex_shader_src,
-	std::string& fragment_shader_src);
+	                               std::string& fragment_shader_src);
 
     char* get_log();
 
     bool is_ready();
 
     void use();
+
+    GLuint get_id const() { return id; }
 
   private:
     //static program* instance;
