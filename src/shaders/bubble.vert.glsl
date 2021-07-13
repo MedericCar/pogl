@@ -10,10 +10,11 @@ uniform mat4 model;
 uniform mat4 modelTransposeInv;
 uniform mat4 projection;
 uniform mat4 view;
+uniform float time;
 
 void main()
 {
     FragPos = vec3(model * vec4(aPos, 1.0));
     Normal = mat3(modelTransposeInv) * aNormal;
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    gl_Position = projection * view * vec4(FragPos + vec3(cos(sin((FragPos.y + FragPos.x)*time))), 1.0);
 }
