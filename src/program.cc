@@ -35,24 +35,6 @@ namespace pogl
     return std::string{};
   }
 
-  program* program::make_program(std::string& vertex_shader_src,
-    std::string& fragment_shader_src)
-  {
-    //Create new program
-    program* instance =  new program();
-
-    //Load and compile shaders
-    instance->vertex_shader =
-      load_and_compile(GL_VERTEX_SHADER, vertex_shader_src);
-    instance->fragment_shader =
-      load_and_compile(GL_FRAGMENT_SHADER, fragment_shader_src);
-
-    //Create program and attach shaders
-    instance->create_program();
-
-    return instance;
-  }
-
   GLuint load_and_compile(GLenum shader_type, std::string& file)
   {
     //Create shader
@@ -92,7 +74,7 @@ namespace pogl
     return shader;
   }
 
-  void program::create_program()
+  void Program::create_program()
   {
     //Create program
     id = glCreateProgram();
@@ -129,9 +111,38 @@ namespace pogl
     glDeleteShader(fragment_shader);
   }
 
-  void program::use()
+  Program::Program(std::string& vertex_shader_src,
+                   std::string& fragment_shader_src)
+  {
+    //Load and compile shaders
+    vertex_shader = load_and_compile(GL_VERTEX_SHADER, vertex_shader_src);
+    fragment_shader = load_and_compile(GL_FRAGMENT_SHADER, fragment_shader_src);
+
+    //Create program and attach shaders
+    this->create_program();
+  }
+
+  void Program::use()
   {
     glUseProgram(id);
+  }
+
+  void Program::set_vec3(const std::string& name, const glm::vec3& value) 
+  {
+    GLint64 uniformId = glGetUniformLocation(id, name.c_str());
+    if (uniformId == -1)
+      std::cerr << "Uniform not found" << "model" << ".\n";
+    else
+      glUniform3fv(uniformId, 1, &value[0]);
+  }
+
+  void Program::set_matrix4(const std::string& name, const glm::mat4& value) 
+  {
+    GLint64 uniformId = glGetUniformLocation(id, name.c_str());
+    if (uniformId == -1)
+      std::cerr << "Uniform not found" << "model" << ".\n";
+    else
+      glUniformMatrix4fv(uniformId, 1, GL_FALSE, &value[0][0]);
   }
 
 }
