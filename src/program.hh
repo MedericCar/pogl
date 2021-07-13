@@ -21,6 +21,8 @@ class Program
     void use();
     GLuint get_id() const { return id; }
 
+    void set_int(const std::string& name, int value);
+    void set_float(const std::string& name, float value);
     void set_vec3(const std::string& name, const glm::vec3& value);
     void set_matrix4(const std::string& name, const glm::mat4& value);
 

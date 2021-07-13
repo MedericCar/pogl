@@ -158,6 +158,8 @@ int main(int argc, char** argv)
   program->set_vec3("lightColor", lightColor);
   program->set_vec3("lightPos", lightPos);
   program->set_vec3("viewPos", camPos);
+  program->set_float("time", glutGet(GLUT_ELAPSED_TIME));
+  TEST_OPENGL_ERROR();
 
   glutMainLoop();
 

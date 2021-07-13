@@ -127,11 +127,29 @@ namespace pogl
     glUseProgram(id);
   }
 
+  void Program::set_int(const std::string& name, int value) 
+  {
+    GLint64 uniformId = glGetUniformLocation(id, name.c_str());
+    if (uniformId == -1)
+      std::cerr << "Uniform not found : " << name << ".\n";
+    else
+      glUniform1i(uniformId, value);
+  }
+
+  void Program::set_float(const std::string& name, float value) 
+  {
+    GLint64 uniformId = glGetUniformLocation(id, name.c_str());
+    if (uniformId == -1)
+      std::cerr << "Uniform not found : " << name << ".\n";
+    else
+      glUniform1f(uniformId, value);
+  }
+
   void Program::set_vec3(const std::string& name, const glm::vec3& value) 
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());
     if (uniformId == -1)
-      std::cerr << "Uniform not found" << "model" << ".\n";
+      std::cerr << "Uniform not found : " << name << ".\n";
     else
       glUniform3fv(uniformId, 1, &value[0]);
   }
@@ -140,7 +158,7 @@ namespace pogl
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());
     if (uniformId == -1)
-      std::cerr << "Uniform not found" << "model" << ".\n";
+      std::cerr << "Uniform not found : " << name << ".\n";
     else
       glUniformMatrix4fv(uniformId, 1, GL_FALSE, &value[0][0]);
   }
