@@ -46,7 +46,7 @@ void init_sphere()
   Point3 center(0, 0, 0);
   Sphere s(center, 1);
 
-  auto data = s.generate_vertices(3, 3);
+  auto data = s.generate_vertices(2, 3);
   /*auto*/ vertices = data.first;
   /*auto*/ indices = data.second;
 
@@ -83,7 +83,8 @@ void renderCallback()
 
   glBindVertexArray(VAO); TEST_OPENGL_ERROR();
   //glDrawArrays(GL_QUADS, 0, vertices.size()); TEST_OPENGL_ERROR();
-  glDrawElements(GL_LINE_STRIP, indices.size(), GL_UNSIGNED_INT, &indices[0]); TEST_OPENGL_ERROR();
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, &indices[0]); TEST_OPENGL_ERROR();
+  //glDrawArrays(GL_POINTS, 0, vertices.size());TEST_OPENGL_ERROR();
   glBindVertexArray(0); TEST_OPENGL_ERROR();
 
   glutSwapBuffers();

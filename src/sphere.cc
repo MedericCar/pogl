@@ -14,8 +14,8 @@ Sphere::Sphere(Point3& center, float radius)
 */
 std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertices(unsigned int lines, unsigned int cols)
 {
-    std::vector<float> verts(lines * cols * 3);
-    std::vector<unsigned int> indices((lines - 1) * (cols - 1) * 4);
+    std::vector<float> verts{};//(lines * cols * 3);
+    std::vector<unsigned int> indices{};//((lines - 1) * (cols - 1) * 4);
 
     if (lines < 2 || cols < 3)
     {
@@ -24,93 +24,71 @@ std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertic
         return {verts, indices};
     }
 
-    /*double sectorStep = 2 * M_PI / sectors;
-    double stackStep = M_PI / stacks;
+    //Top vertex
+    verts.push_back(0);
+    verts.push_back(radius);
+    verts.push_back(0);
 
-    for (unsigned int i = 0; i <= stacks; i++)
+    for (unsigned int i = 0; i < lines - 1; ++i)
     {
-        double stackAngle = 2 * M_PI  / stackStep;
-        double rcos = radius * std::cos(stackAngle);
-        double z = radius * std::sin(stackAngle);
-
-        for (unsigned int j = 0; j <= sectors; j++)
+        double r = M_PI * (i + 1) / lines;
+        for (unsigned int j = 0; j < cols; ++j)
         {
-            double sectorAngle = j * sectorStep;
+            double s = 2 *  M_PI * j / cols;
 
-            // vertex position (x, y, z)
-            double x = rcos * std::cos(sectorAngle);// r * cos(u) * cos(v)
-            double y = rcos * std::sin(sectorAngle);// r * cos(u) * sin(v)          
-            
+            double x = std::sin(r) * std::cos(s);
+            double y = std::cos(r);
+            double z = std::sin(r) * std::sin(r);
+
+            verts.push_back(x);
             verts.push_back(y);
             verts.push_back(z);
-            verts.push_back(-x);
         }
         
+    }    
+
+    //Bottom vertex
+    verts.push_back(0);
+    verts.push_back(-radius);
+    verts.push_back(0);
+
+    //Top and Bot
+    for (unsigned int i = 0; i < cols; ++i)
+    {
+        unsigned int i0 = i + 1;
+        unsigned int i1 = (i + 1) % cols + 1;
+        indices.push_back(0);
+        indices.push_back(i1);
+        indices.push_back(i0);
+
+        i0 = i + cols * (lines - 2) + 1;
+        i1 = (i + 1) % cols + cols * (lines - 2) + 1;
+        indices.push_back(verts.size() / 3 - 1);
+        indices.push_back(i1);
+        indices.push_back(i0);
     }
-    //DO NOT FORGET TO ADD LAST TEXTURE COORDS   
 
-
-    for (size_t i = 0; i < count; i++)
+    for (int j = 0; j < lines - 2; j++)
     {
-        for (size_t j = 0; j < count; j++)
+        unsigned int j0 = j * cols + 1;
+        unsigned int j1 = (j + 1) * cols + 1;
+        for (int i = 0; i < cols; i++)
         {
-        }        
-    }*/
+            unsigned int i0 = j0 + i;
+            unsigned int i1 = j0 + (i + 1) % cols;
+            unsigned int i2 = j1 + (i + 1) % cols;
+            unsigned int i3 = j1 + i;
+            
 
-    float R = 1./(lines - 1);
-    float S = 1./(cols - 1);
-    //int r, s;
+            indices.push_back(i0);
+            indices.push_back(i1);
+            indices.push_back(i2);
 
-
-    /*sphere_vertices.resize(rings * sectors * 3);
-    sphere_normals.resize(rings * sectors * 3);
-    sphere_texcoords.resize(rings * sectors * 2);*/
-    //std::vector<float>::iterator v = sphere_vertices.begin();
-    //std::vector<GLfloat>::iterator n = sphere_normals.begin();
-    //std::vector<GLfloat>::iterator t = sphere_texcoords.begin();
-    unsigned int index = 0;
-    for(unsigned int i = 0; i < lines; i++)
-    {
-        for(unsigned int j = 0; j < cols; j++)
-        {
-                double x = std::cos(2*M_PI * j * S) * std::sin( M_PI * i * R );
-                double y = std::sin(-M_PI / 2 + M_PI * i * R);
-                double z = std::sin(2*M_PI * j * S) * std::sin( M_PI * i * R );
-
-                //*t++ = s*S;
-                //*t++ = r*R;
-
-                //std::cout << x << "," << y << "," << z << std::endl;
-
-                /**v++*/verts[index++] = x * radius;
-                /**v++*/verts[index++] = y * radius;
-                /**v++*/verts[index++] = z * radius;
-
-                //*n++ = x;
-                //*n++ = y;
-                //*n++ = z;
+            indices.push_back(i1);
+            indices.push_back(i2);
+            indices.push_back(i3);
         }
     }
-
-    //sphere_indices.resize(rings * sectors * 4);
-    index = 0;
-
-    //std:vector<unsigned int>::iterator it = sphere_indices.begin();
-
-    for(unsigned int i = 0; i < lines -1; i++)
-    {
-        for(unsigned int j = 0; j < cols - 1; j++)
-        {
-                /**i++*/indices[index++] = i * cols + j;
-                /**i++*/indices[index++] = i * cols + (j + 1);
-                /**i++*/indices[index++] = (i + 1) * cols + (j + 1);
-                /**i++*/indices[index++] = (i + 1) * cols + j;
-        }
-    }
-
-
-    /*std::cout << "Actual size: " << verts.size() << std::endl;
-    std::cout << "Expected size: " << lines * cols + 2 << std::endl;*/
 
     return {verts, indices};
 }
