@@ -21,6 +21,8 @@ include_directories(
 
 set(SRC
     "src/program.cc"
+    "src/sphere.cc"
+    "src/vector3.cc"
     "src/main.cc")
 
 set(OPT_FLAGS

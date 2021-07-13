@@ -33,7 +33,7 @@ class program
 
     void use();
 
-    GLuint get_id const() { return id; }
+    GLuint get_id() const { return id; }
 
   private:
     //static program* instance;
