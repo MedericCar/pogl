@@ -110,7 +110,7 @@ void render(GLFWwindow* window, pogl::Program* program)
 
   glBindVertexArray(VAO); TEST_OPENGL_ERROR();
   //glDrawArrays(GL_QUADS, 0, vertices.size()); TEST_OPENGL_ERROR();
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, &indices[0]); TEST_OPENGL_ERROR();
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, /*&indices[0]*/0); TEST_OPENGL_ERROR();
   //glDrawArrays(GL_POINTS, 0, vertices.size());TEST_OPENGL_ERROR();
   glBindVertexArray(0); TEST_OPENGL_ERROR();
 
