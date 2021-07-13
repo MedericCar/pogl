@@ -1,11 +1,9 @@
-#define GLEW_STATIC
-
-#include <iostream>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
 #include "program.hh"
 
@@ -74,35 +72,29 @@ glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 GLuint VBO;
 GLuint VAO;
 
-void window_resize(int width, int height)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
   glViewport(0, 0, width, height);
 }
 
-void renderCallback()
+GLFWwindow* initGLFW()
 {
-  glClearColor(0, 0, 0, 1);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-  glBindVertexArray(VAO);
-  glDrawArrays(GL_TRIANGLES, 0, 36);
-  TEST_OPENGL_ERROR();
-  
-  glutSwapBuffers();
-}
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-bool initGlut(int &argc, char* argv[])
-{
-  glutInit(&argc, argv);
-  glutInitContextVersion(4, 5);
-  glutInitContextProfile(GLUT_CORE_PROFILE);
-  glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
-  glutInitWindowSize(WIDTH, HEIGHT);
-  glutInitWindowPosition(10, 10);
-  glutCreateWindow ("Bob the Blob");
-  glutDisplayFunc(renderCallback);
-  glutReshapeFunc(window_resize);
-  return true;
+  GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
+  if (window == NULL)
+  {
+      std::cout << "Failed to create GLFW window" << std::endl;
+      glfwTerminate();
+  }
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  //glfwSetCursorPosCallback(window, mouse_callback); 
+
+  return window;
 }
 
 void initGL()
@@ -111,13 +103,28 @@ void initGL()
   glDepthFunc(GL_LESS);
 }
 
+void render(GLFWwindow* window, pogl::Program* program)
+{
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  
+  glBindVertexArray(VAO);
+  program->set_float("time", glfwGetTime());
+  glDrawArrays(GL_TRIANGLES, 0, 36);
+  TEST_OPENGL_ERROR();
+  
+  glfwSwapBuffers(window);
+  glfwPollEvents();
+}
+
+
 int main(int argc, char** argv)
 {
-  initGlut(argc, argv);
+  GLFWwindow* window = initGLFW();
 
   GLenum err = glewInit();
   if (err != GLEW_OK)
-  std::cout << glewGetErrorString(err) << std::endl;
+    std::cout << glewGetErrorString(err) << std::endl;
 
   initGL();
 
@@ -144,7 +151,9 @@ int main(int argc, char** argv)
 
   glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 modelTransposeInv = glm::transpose(glm::inverse(model));
-  glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                          (float)WIDTH / (float)HEIGHT,
+                                          0.1f, 100.0f);
   glm::mat4 view = glm::lookAt(camPos, camPos + camFront, camUp);
   program->set_matrix4("model", model);  
   program->set_matrix4("modelTransposeInv", modelTransposeInv);
@@ -158,15 +167,18 @@ int main(int argc, char** argv)
   program->set_vec3("lightColor", lightColor);
   program->set_vec3("lightPos", lightPos);
   program->set_vec3("viewPos", camPos);
-  program->set_float("time", glutGet(GLUT_ELAPSED_TIME));
   TEST_OPENGL_ERROR();
 
-  glutMainLoop();
+  while(!glfwWindowShouldClose(window))
+  {
+    render(window, program);
+  }
 
   delete program;
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
   TEST_OPENGL_ERROR();
 
+  glfwTerminate();
   return 0;
 }

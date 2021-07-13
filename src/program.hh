@@ -1,12 +1,12 @@
 #pragma once
 
-#include <string>
 #include <GL/glew.h>
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <err.h>
+#include <fstream>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace pogl
 {

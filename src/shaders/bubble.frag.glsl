@@ -21,5 +21,5 @@ void main()
     float diff = max(dot(norm, lightDir), 0.0);
     float spec = pow(max(dot(reflect(-lightDir, norm), viewDir), 0.0), 32);
     FragColor = vec4((ambientStrength + diff + spec) * lightColor * objectColor, 1.0);
-    FragColor = time * vec4((ambientStrength + diff + spec) * FragPos * norm, 1.0);
+    FragColor = vec4((ambientStrength + diff + spec) * FragPos * lightColor, 1.0);
 } 
