@@ -1,11 +1,9 @@
-#define GLEW_STATIC
-
-#include <iostream>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
 
 #include "program.hh"
 #include "sphere.hh"
@@ -33,7 +31,7 @@ std::vector<float> vertices;
 std::vector<unsigned int> indices;
 
 // Camera settings
-glm::vec3 camPos(0.0f, 0.0f, 3.0f);
+glm::vec3 camPos(0.2f, 1.0f, 5.0f);
 glm::vec3 camUp(0.0f, 1.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 
@@ -69,14 +67,43 @@ void init_sphere()
   glBindVertexArray(0); TEST_OPENGL_ERROR();
 }
 
-void window_resize(int width, int height)
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-  glViewport(0, 0,width, height);TEST_OPENGL_ERROR();
+  glViewport(0, 0, width, height);
 }
 
-void renderCallback()
+GLFWwindow* initGLFW()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);TEST_OPENGL_ERROR();
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
+  if (window == NULL)
+  {
+      std::cout << "Failed to create GLFW window" << std::endl;
+      glfwTerminate();
+  }
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  //glfwSetCursorPosCallback(window, mouse_callback); 
+
+  return window;
+}
+
+void initGL()
+{
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+}
+
+void render(GLFWwindow* window, pogl::Program* program)
+{
+  glClearColor(0, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  
+  program->set_float("time", glfwGetTime());
   
   /*glBindVertexArray(VAO);TEST_OPENGL_ERROR();
   glDrawArrays(GL_TRIANGLES, 0, 3);TEST_OPENGL_ERROR();*/
@@ -87,72 +114,79 @@ void renderCallback()
   //glDrawArrays(GL_POINTS, 0, vertices.size());TEST_OPENGL_ERROR();
   glBindVertexArray(0); TEST_OPENGL_ERROR();
 
-  glutSwapBuffers();
+  glfwSwapBuffers(window);
+  glfwPollEvents();
 }
 
-bool initGlut(int &argc, char* argv[])
-{
-  glutInit(&argc, argv);
-  glutInitContextVersion(4, 5);
-  glutInitContextProfile(GLUT_CORE_PROFILE);
-  glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE|GLUT_DEPTH);
-  glutInitWindowSize(WIDTH, HEIGHT);
-  glutInitWindowPosition(10, 10);
-  glutCreateWindow ("Bob the Blob");
-  glutDisplayFunc(renderCallback);
-  glutReshapeFunc(window_resize);
-  return true;
-}
-
-void initGL()
-{
-  glEnable(GL_DEPTH_TEST);TEST_OPENGL_ERROR();
-  glDepthFunc(GL_ALWAYS);TEST_OPENGL_ERROR();
-}
 
 int main(int argc, char** argv)
 {
-
-  initGlut(argc, argv);
+  GLFWwindow* window = initGLFW();
 
   GLenum err = glewInit();
   if (err != GLEW_OK)
-  std::cout << glewGetErrorString(err) << std::endl;
+    std::cout << glewGetErrorString(err) << std::endl;
 
   initGL();
 
   std::string file_v("../src/shaders/bubble.vert.glsl");
   std::string file_f("../src/shaders/bubble.frag.glsl");
   
-  pogl::program* instance = pogl::program::make_program(file_v, file_f);
-  instance->use();
+  pogl::Program* program = new pogl::Program(file_v, file_f);
+  program->use();
 
   init_sphere();
 
   /*glGenVertexArrays(1, &VAO);TEST_OPENGL_ERROR();
   glGenBuffers(1, &VBO);TEST_OPENGL_ERROR();
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
 
-  glBindVertexArray(VAO);TEST_OPENGL_ERROR();
+  glBindVertexArray(VAO);
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);TEST_OPENGL_ERROR();
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);TEST_OPENGL_ERROR();
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  TEST_OPENGL_ERROR();
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);TEST_OPENGL_ERROR();
-  glEnableVertexAttribArray(0);TEST_OPENGL_ERROR();*/
+  glEnableVertexAttribArray(0);TEST_OPENGL_ERROR();
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+  TEST_OPENGL_ERROR();
+  */
 
   glm::mat4 model = glm::mat4(1.0f);
-  glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+  glm::mat4 modelTransposeInv = glm::transpose(glm::inverse(model));
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                          (float)WIDTH / (float)HEIGHT,
+                                          0.1f, 100.0f);
   glm::mat4 view = glm::lookAt(camPos, camPos + camFront, camUp);
-  
-  glUniformMatrix4fv(glGetUniformLocation(instance->get_id(), "model"), 1, GL_FALSE, &model[0][0]);
-  glUniformMatrix4fv(glGetUniformLocation(instance->get_id(), "projection"), 1, GL_FALSE, &projection[0][0]);
-  glUniformMatrix4fv(glGetUniformLocation(instance->get_id(), "view"), 1, GL_FALSE, &view[0][0]);
+  program->set_matrix4("model", model);  
+  program->set_matrix4("modelTransposeInv", modelTransposeInv);
+  program->set_matrix4("projection", projection);  
+  program->set_matrix4("view", view);  
 
-  glutMainLoop();
+  glm::vec3 objectColor(1.0f, 0.0f, 0.0f);
+  glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+  glm::vec3 lightPos(0.0f, 2.0f, -2.0f);
+  program->set_vec3("objectColor", objectColor);
+  program->set_vec3("lightColor", lightColor);
+  program->set_vec3("lightPos", lightPos);
+  program->set_vec3("viewPos", camPos);
+  TEST_OPENGL_ERROR();
 
-  delete instance;
+  while(!glfwWindowShouldClose(window))
+  {
+    render(window, program);
+  }
+
+  delete program;
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
+  TEST_OPENGL_ERROR();
 
+  glfwTerminate();
   return 0;
 }
