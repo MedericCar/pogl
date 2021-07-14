@@ -13,13 +13,25 @@ std::vector<float> vertices;
 std::vector<unsigned int> indices;
 
 // Camera settings
+//FRONT
 glm::vec3 camPos(0.0f, 0.0f, 8.0f);
 glm::vec3 camUp(0.0f, 1.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 
-/*glm::vec3 camPos(0.2f, 8.0f, 0.0f);
+//UP
+/*glm::vec3 camPos(0.0f, 8.0f, 0.0f);
 glm::vec3 camUp(0.0f, 0.0f, 1.0f);
 glm::vec3 camFront(0.0f, -1.0f, 0.0f);*/
+
+//RIGHT
+/*glm::vec3 camPos(8.0f, 0.0f, 0.0f);
+glm::vec3 camUp(0.0f, 1.0f, 0.0f);
+glm::vec3 camFront(-1.0f, 0.0f, 0.0f);*/
+
+//LEFT
+/*glm::vec3 camPos(-8.0f, 0.0f, 0.0f);
+glm::vec3 camUp(0.0f, 1.0f, 0.0f);
+glm::vec3 camFront(1.0f, 0.0f, 0.0f);*/
 
 GLuint VBO;
 GLuint VAO;
@@ -62,11 +74,18 @@ void render(GLFWwindow* window, pogl::Program* program)
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glDisable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
   program->set_float("time", glfwGetTime());
   
   glBindVertexArray(VAO); 
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
   glBindVertexArray(0); 
+
+  glDisable(GL_BLEND);
 
   glfwSwapBuffers(window);
   glfwPollEvents();
@@ -75,6 +94,12 @@ void render(GLFWwindow* window, pogl::Program* program)
 
 int main(int argc, char** argv)
 {
+  if (argc != 3)
+  {
+    std::cerr << "Please give me a vertex shader and a fragment shader !" << std::endl;
+    return 1;
+  }
+
   // Setup
   GLFWwindow* window = pogl::initGLFW();
 
@@ -85,8 +110,8 @@ int main(int argc, char** argv)
   pogl::initGL();
 
   // Create shaders program
-  std::string file_v("../src/shaders/bubble.vert.glsl");
-  std::string file_f("../src/shaders/bubble.frag.glsl");
+  std::string file_v(argv[1]/*"../src/shaders/bubble.vert.glsl"*/);
+  std::string file_f(argv[2]/*"../src/shaders/bubble.frag.glsl"*/);
   pogl::Program* program = new pogl::Program(file_v, file_f);
   program->use();
 
@@ -108,7 +133,7 @@ int main(int argc, char** argv)
   // Load view information
   glm::vec3 objectColor(1.0f, 0.0f, 0.0f);
   glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-  glm::vec3 lightPos(0.0f, 2.0f, 0.0f);
+  glm::vec3 lightPos(0.0f, 3.0f, 3.0f);
   program->set_vec3("objectColor", objectColor);
   program->set_vec3("lightColor", lightColor);
   program->set_vec3("lightPos", lightPos);

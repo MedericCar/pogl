@@ -5,6 +5,7 @@ layout (location = 1) in vec3 aNormal;
 
 out vec3 FragPos;
 out vec3 Normal;
+out float coef;
   
 uniform mat4 model;
 uniform mat4 modelTransposeInv;
@@ -25,7 +26,7 @@ vec2 randomGrad(float ix, float iy)
 {
     /*float x = *ix;
     float y = *iy;*/
-    float val = 465 * sin(ix * 1654 + iy * 1998 + 7518) *
+    float val = time * 5 * sin(ix * 1654 + iy * 1998 + 7518) *
         cos(ix * 2317 * iy * 2132 + 975);
 
     /**ix = cos(val);
@@ -79,10 +80,10 @@ void main()
 
     vec4 pos = projection * view * vec4(FragPos, 1.0);
     //float coef = perlin(pos.x, pos.y);
-    float coef = perlin(perlin(pos.x, pos.y), pos.z);
+    coef = clamp(perlin(perlin(pos.x, pos.y), pos.z), 0, 1);
 
-    pos.x += pos.x * coef;
-    pos.y += pos.y * coef;
-    //pos.z += pos.z * coef;
+    pos.x += /*pos.x */ coef;
+    pos.y += /*pos.y */ coef;
+    //pos.z += /*pos.z */ coef;
     gl_Position = pos;
 }
