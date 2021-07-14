@@ -9,12 +9,12 @@ uniform vec3 objectColor;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
-//uniform float time;
+uniform float time;
 
 
 void main()
 {
-    float ambientStrength = 1;
+    float ambientStrength = 0.1;
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPos - FragPos);
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -22,5 +22,4 @@ void main()
     float spec = pow(max(dot(reflect(-lightDir, norm), viewDir), 0.0), 32);
 
     FragColor = vec4((ambientStrength + diff + spec) * lightColor * objectColor, 1.0);
-    //FragColor = vec4(Normal, 1);
 } 

@@ -21,10 +21,12 @@ include_directories(
 )
 
 set(SRC
+    "src/main.cc"
     "src/program.cc"
+    "src/setup.cc"
     "src/sphere.cc"
     "src/vector3.cc"
-    "src/main.cc")
+)
 
 set(OPT_FLAGS
     "-Ofast -mtune=native -floop-parallelize-all -fgcse-sm"
