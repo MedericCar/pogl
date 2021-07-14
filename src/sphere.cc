@@ -3,7 +3,8 @@
 
 Sphere::Sphere(Point3& center, float radius)
 : center(center),
-  radius(radius)
+  radius(radius),
+  normals(std::vector<float>{})
 {    
 }
 
@@ -29,6 +30,11 @@ std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertic
     verts.push_back(radius);
     verts.push_back(0);
 
+    //Top normal
+    verts.push_back(0);
+    verts.push_back(1);
+    verts.push_back(0);
+
     for (unsigned int i = 0; i < lines - 1; ++i)
     {
         double r = M_PI * (i + 1) / lines;
@@ -38,7 +44,11 @@ std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertic
 
             double x = std::sin(r) * std::cos(s);
             double y = std::cos(r);
-            double z = std::sin(r) * std::sin(r);
+            double z = std::sin(r) * std::sin(s);
+
+            verts.push_back(x * radius);
+            verts.push_back(y * radius);
+            verts.push_back(z * radius);
 
             verts.push_back(x);
             verts.push_back(y);
@@ -50,6 +60,11 @@ std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertic
     //Bottom vertex
     verts.push_back(0);
     verts.push_back(-radius);
+    verts.push_back(0);
+    
+    //Bottom normal
+    verts.push_back(0);
+    verts.push_back(-1);
     verts.push_back(0);
 
     //Top and Bot
@@ -63,10 +78,11 @@ std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertic
 
         i0 = i + cols * (lines - 2) + 1;
         i1 = (i + 1) % cols + cols * (lines - 2) + 1;
-        indices.push_back(verts.size() / 3 - 1);
-        indices.push_back(i1);
+        indices.push_back(verts.size() / 6 - 1);
         indices.push_back(i0);
+        indices.push_back(i1);
     }
+
 
     for (int j = 0; j < lines - 2; j++)
     {
@@ -82,11 +98,11 @@ std::pair<std::vector<float>, std::vector<unsigned int>> Sphere::generate_vertic
 
             indices.push_back(i0);
             indices.push_back(i1);
-            indices.push_back(i2);
+            indices.push_back(i3);
 
+            indices.push_back(i3);
             indices.push_back(i1);
             indices.push_back(i2);
-            indices.push_back(i3);
         }
     }
 

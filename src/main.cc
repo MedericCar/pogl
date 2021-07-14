@@ -44,7 +44,7 @@ void init_sphere()
   Point3 center(0, 0, 0);
   Sphere s(center, 1);
 
-  auto data = s.generate_vertices(2, 3);
+  auto data = s.generate_vertices(80, 80);
   /*auto*/ vertices = data.first;
   /*auto*/ indices = data.second;
 
@@ -61,8 +61,12 @@ void init_sphere()
                  &indices[0], GL_STATIC_DRAW); TEST_OPENGL_ERROR();
 
   //vertex pos
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); TEST_OPENGL_ERROR();
   glEnableVertexAttribArray(0); TEST_OPENGL_ERROR();
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0); TEST_OPENGL_ERROR();
+
+  //vertex normals
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); TEST_OPENGL_ERROR();
+  glEnableVertexAttribArray(1); TEST_OPENGL_ERROR();
 
   glBindVertexArray(0); TEST_OPENGL_ERROR();
 }
@@ -103,7 +107,7 @@ void render(GLFWwindow* window, pogl::Program* program)
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-  program->set_float("time", glfwGetTime());
+  //program->set_float("time", glfwGetTime());
   
   /*glBindVertexArray(VAO);TEST_OPENGL_ERROR();
   glDrawArrays(GL_TRIANGLES, 0, 3);TEST_OPENGL_ERROR();*/
