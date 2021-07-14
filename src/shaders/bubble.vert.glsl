@@ -10,7 +10,7 @@ uniform mat4 model;
 uniform mat4 modelTransposeInv;
 uniform mat4 projection;
 uniform mat4 view;
-//uniform float time;
+uniform float time;
 
 
 float interpolate(float a0, float a1, float w)

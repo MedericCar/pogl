@@ -1,14 +1,5 @@
 #include "program.hh"
 
-#define TEST_OPENGL_ERROR()                                                             \
-  do {                                                                                  \
-    GLenum err = glGetError();                                                          \
-    if (err != GL_NO_ERROR) std::cerr << "OpenGL ERROR: "                               \
-                                      << gluErrorString(err)                            \
-                                      << " file " << __FILE__                           \
-                                      << " line " << __LINE__ << std::endl;             \
-  } while(0)
-
 namespace pogl
 {
 
@@ -130,37 +121,25 @@ namespace pogl
   void Program::set_int(const std::string& name, int value) 
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());
-    if (uniformId == -1)
-      std::cerr << "Uniform not found : " << name << ".\n";
-    else
-      glUniform1i(uniformId, value);
+    glUniform1i(uniformId, value);
   }
 
   void Program::set_float(const std::string& name, float value) 
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());
-    if (uniformId == -1)
-      std::cerr << "Uniform not found : " << name << ".\n";
-    else
-      glUniform1f(uniformId, value);
+    glUniform1f(uniformId, value);
   }
 
   void Program::set_vec3(const std::string& name, const glm::vec3& value) 
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());
-    if (uniformId == -1)
-      std::cerr << "Uniform not found : " << name << ".\n";
-    else
-      glUniform3fv(uniformId, 1, &value[0]);
+    glUniform3fv(uniformId, 1, &value[0]);
   }
 
   void Program::set_matrix4(const std::string& name, const glm::mat4& value) 
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());
-    if (uniformId == -1)
-      std::cerr << "Uniform not found : " << name << ".\n";
-    else
-      glUniformMatrix4fv(uniformId, 1, GL_FALSE, &value[0][0]);
+    glUniformMatrix4fv(uniformId, 1, GL_FALSE, &value[0][0]);
   }
 
 }
