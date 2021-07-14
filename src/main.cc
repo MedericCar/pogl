@@ -31,9 +31,13 @@ std::vector<float> vertices;
 std::vector<unsigned int> indices;
 
 // Camera settings
-glm::vec3 camPos(0.2f, 1.0f, 5.0f);
+glm::vec3 camPos(0.2f, 0.0f, 8.0f);
 glm::vec3 camUp(0.0f, 1.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
+
+/*glm::vec3 camPos(0.2f, 8.0f, 0.0f);
+glm::vec3 camUp(0.0f, 0.0f, 1.0f);
+glm::vec3 camFront(0.0f, -1.0f, 0.0f);*/
 
 GLuint VBO;
 GLuint VAO;
@@ -107,6 +111,8 @@ void render(GLFWwindow* window, pogl::Program* program)
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
+  //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
   //program->set_float("time", glfwGetTime());
   
   /*glBindVertexArray(VAO);TEST_OPENGL_ERROR();
