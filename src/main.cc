@@ -26,9 +26,25 @@ std::vector<float> vertices;
 std::vector<unsigned int> indices;
 
 // Camera settings
-glm::vec3 camPos(0.0f, 0.0f, 5.0f);
+//FRONT
+glm::vec3 camPos(0.0f, 0.0f, 8.0f);
 glm::vec3 camUp(0.0f, 1.0f, 0.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
+
+//UP
+/*glm::vec3 camPos(0.0f, 8.0f, 0.0f);
+glm::vec3 camUp(0.0f, 0.0f, 1.0f);
+glm::vec3 camFront(0.0f, -1.0f, 0.0f);*/
+
+//RIGHT
+/*glm::vec3 camPos(8.0f, 0.0f, 0.0f);
+glm::vec3 camUp(0.0f, 1.0f, 0.0f);
+glm::vec3 camFront(-1.0f, 0.0f, 0.0f);*/
+
+//LEFT
+/*glm::vec3 camPos(-8.0f, 0.0f, 0.0f);
+glm::vec3 camUp(0.0f, 1.0f, 0.0f);
+glm::vec3 camFront(1.0f, 0.0f, 0.0f);*/
 
 GLuint VBO;
 GLuint VAO;
@@ -67,6 +83,11 @@ void init_sphere()
   glBindVertexArray(0); 
 }
 
+void render_wave(GLFWwindow* window, pogl::Program* program)
+{
+
+}
+
 void render_blob(GLFWwindow* window, pogl::Program* program)
 {
   program->use();
@@ -87,7 +108,22 @@ void render_blob(GLFWwindow* window, pogl::Program* program)
   program->set_float("time", glfwGetTime());
 }
 
-void render(GLFWwindow* window, pogl::Program* program)
+void render_morphing(GLFWwindow* window, pogl::Program* program)
+{
+
+}
+
+void render_laser(GLFWwindow* window, pogl::Program* program)
+{
+
+}
+
+void render_random(GLFWwindow* window, pogl::Program* program)
+{
+
+}
+
+void render(GLFWwindow* window, std::vector<pogl::Program*> programs)
 {
   glfwPollEvents();
   glClearColor(0, 0, 0, 1);
@@ -98,19 +134,29 @@ void render(GLFWwindow* window, pogl::Program* program)
   ImGui::NewFrame();
 
   ImGui::Begin("Parameters");
-  const char* effects[3] = { "Wave", "Blob", "Morphing"};
-  static int curr_effect = 1;
-  ImGui::ListBox("Effects", &curr_effect, effects, 3, 2);
+  const char* effects[5] = { "Wave", "Blob", "Morphing", "Laser", "Random"};
+  static int curr_effect = 0;
+  ImGui::ListBox("Effects", &curr_effect, effects, 5, 2);
   ImGui::BeginChild("Effects");
-  if (curr_effect == 0)
+  switch (curr_effect)
   {
-  }
-  else if (curr_effect == 1)
-  {
-    render_blob(window, program);
-  }
-  else if (curr_effect == 2)
-  {
+  case 0:
+    render_wave(window, programs[0]);
+    break;
+  case 1:
+    render_blob(window, programs[1]);
+    break;
+  case 3:
+    render_morphing(window, programs[2]);
+    break;
+  case 4:
+    render_laser(window, programs[3]);
+    break;
+  case 5:
+    render_random(window, programs[4]);
+    break;
+  default:
+    break;
   }
   ImGui::EndChild();
   ImGui::End();
@@ -164,9 +210,25 @@ int main(int argc, char** argv)
   pogl::initGL();
 
   // Create shaders program
-  std::string file_v("../src/shaders/bubble.vert.glsl");
-  std::string file_f("../src/shaders/bubble.frag.glsl");
-  pogl::Program* blob_program = new pogl::Program(file_v, file_f);
+  std::string file_v1("../src/shaders/bubble.vert.glsl");
+  std::string file_f1("../src/shaders/bubble.frag.glsl");
+  pogl::Program* blob_program = new pogl::Program(file_v1, file_f1);
+
+  std::string file_v2("../src/shaders/laser.vert.glsl");
+  std::string file_f2("../src/shaders/laser.frag.glsl");
+  pogl::Program* laser_program = new pogl::Program(file_v2, file_f2);
+
+  std::string file_v3("../src/shaders/morph.vert.glsl");
+  std::string file_f3("../src/shaders/morph.frag.glsl");
+  pogl::Program* morph_program = new pogl::Program(file_v3, file_f3);
+
+  std::string file_v4("../src/shaders/random.vert.glsl");
+  std::string file_f4("../src/shaders/random.frag.glsl");
+  pogl::Program* random_program = new pogl::Program(file_v4, file_f4);
+
+  std::string file_v5("../src/shaders/wave.vert.glsl");
+  std::string file_f5("../src/shaders/wave.frag.glsl");
+  pogl::Program* wave_program = new pogl::Program(file_v5, file_f5);
 
   // Load sphere mesh to buffers
   init_sphere();
@@ -175,15 +237,38 @@ int main(int argc, char** argv)
   blob_program->use();
   load_transform_matrices(blob_program);
   load_scene(blob_program);
+
+  laser_program->use();
+  load_transform_matrices(laser_program);
+  load_scene(laser_program);
+
+  morph_program->use();
+  load_transform_matrices(morph_program);
+  load_scene(morph_program);
+
+  random_program->use();
+  load_transform_matrices(random_program);
+  load_scene(random_program);
+
+  wave_program->use();
+  load_transform_matrices(wave_program);
+  load_scene(wave_program);
   
   // Render loop
   while(!glfwWindowShouldClose(window))
   {
-    render(window, blob_program);
+    std::vector<pogl::Program*> programs = {
+      wave_program, blob_program, morph_program, laser_program, random_program
+    };
+    render(window, programs);
   }
 
   // Cleanup
   delete blob_program;
+  delete laser_program;
+  delete morph_program;
+  delete random_program;
+  delete wave_program;
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
 
@@ -191,7 +276,6 @@ int main(int argc, char** argv)
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
     
-
   glfwTerminate();
   return 0;
 }
