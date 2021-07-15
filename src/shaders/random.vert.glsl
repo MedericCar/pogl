@@ -18,19 +18,12 @@ float interpolate(float a0, float a1, float w)
 {
     w = clamp(w, 0, 1);
     return (1 - w) * a0 + a1 * w;
-    //return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
-    //return (a1 - a0) * ((w * (w * 6.0 - 15.0) + 10.0) * w * w * w) + a0;
 }
 
 vec2 randomGrad(float ix, float iy)
 {
-    /*float x = *ix;
-    float y = *iy;*/
     float val = time * 5 * sin(ix * 1654 + iy * 1998 + 7518) *
         cos(ix * 2317 * iy * 2132 + 975);
-
-    /**ix = cos(val);
-    *iy = sin(val);*/
 
     return vec2(cos(val), sin(val));
 }
@@ -79,11 +72,15 @@ void main()
     Normal = mat3(modelTransposeInv) * aNormal;
 
     vec4 pos = projection * view * vec4(FragPos, 1.0);
-    //float coef = perlin(pos.x, pos.y);
-    coef = clamp(perlin(perlin(pos.x, pos.y), pos.z), 0, 1);
+    float noise = clamp(perlin(perlin(pos.x, pos.y), pos.z), 0, 1);
 
-    pos.x += /*pos.x */ coef;
-    pos.y += /*pos.y */ coef;
-    //pos.z += /*pos.z */ coef;
+    pos.x +=  noise;
+    pos.y += noise;
+
+    vec3 norm = normalize(FragPos);
+    //coef = round(max(abs(norm.x), max(abs(norm.y), abs(norm.z))) * 40) / 40;
+    //coef = round(max(abs(norm.x), abs(norm.y)) * 40) / 40;
+    coef = round(abs(norm.z) * 40) / 40;
+
     gl_Position = pos;
 }

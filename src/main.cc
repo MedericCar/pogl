@@ -101,7 +101,6 @@ void render_blob(GLFWwindow* window, pogl::Program* program)
   ImGui::ColorEdit3("color1", &color1[0]);
   static glm::vec4 color2(0.6157f, 0.1216f, 0.0f, 1.0f);
   ImGui::ColorEdit3("color2", &color2[0]);
-  ImGui::End();
 
   program->set_float("freq", frequency);
   program->set_float("amplitude", amplitude);
@@ -128,6 +127,10 @@ void render_random(GLFWwindow* window, pogl::Program* program)
 {
   program->use();
 
+  static glm::vec3 color1(1.0f, 0.0f, 0.0f);
+  ImGui::ColorEdit3("color", &color1[0]);
+
+  program->set_vec3("color", color1);
   program->set_float("time", glfwGetTime());
 }
 

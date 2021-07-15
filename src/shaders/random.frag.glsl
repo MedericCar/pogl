@@ -7,6 +7,7 @@ in float coef;
 out vec4 FragColor;
   
 uniform vec3 objectColor;
+uniform vec3 color;
 uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
@@ -21,10 +22,15 @@ void main()
     float diff = max(dot(norm, lightDir), 0.0);
     float spec = pow(max(dot(reflect(-lightDir, norm), viewDir), 0.0), 32);
 
-    float coef_center = 1 - max(abs(FragPos.x), abs(FragPos.y));
-    vec3 color_center = vec3(0, coef_center, 0);
+    float mini = min(color.x, min(color.y ,color.z));
+    vec3 color_center;
 
-    //FragColor = vec4(color_center + (ambientStrength + diff + spec) * lightColor * (objectColor + color_center), 0.1);
-    //FragColor = vec4(Normal, 1);
-    FragColor = vec4(objectColor + color_center, 1);//clamp(coef + 0.5, 0.5, 1);
+    if (mini == color.x)
+        color_center = vec3(coef, 0, 0);
+    else if (mini == color.y)
+        color_center = vec3(0, coef, 0);
+    else
+        color_center = vec3(0, 0, coef);
+
+    FragColor = vec4(color + color_center, 1);//clamp(coef + 0.5, 0.5, 1);
 } 
