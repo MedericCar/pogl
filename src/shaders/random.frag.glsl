@@ -32,5 +32,5 @@ void main()
     else
         color_center = vec3(0, 0, coef);
 
-    FragColor = vec4(color + color_center, 1);//clamp(coef + 0.5, 0.5, 1);
+    FragColor = vec4((ambientStrength + diff + spec) * lightColor * (color + color_center), 1);
 } 
