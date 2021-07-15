@@ -1,24 +1,8 @@
-
-# SETUP
 cmake_minimum_required(VERSION 3.12)
 project(pogl)
 
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(glm REQUIRED)
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
-
-include_directories(
-    ${OPENGL_INCLUDE_DIRS}
-    ${GLEW_INCLUDE_DIRS}
-    ${GLM_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
-)
-
-include_directories(
-    "src"
-)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo_multi.cmake)
+conan_basic_setup()
 
 set(SRC
     "src/main.cc"
@@ -28,38 +12,14 @@ set(SRC
     "src/vector3.cc"
 )
 
-set(OPT_FLAGS
-    "-Ofast -mtune=native -floop-parallelize-all -fgcse-sm"
+add_executable(pogl
+    ${SRC}
+    bindings/imgui_impl_glfw.cpp
+    bindings/imgui_impl_opengl3.cpp
+    bindings/imgui_impl_glfw.h
+    bindings/imgui_impl_opengl3.h
 )
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS} -Wall -Wextra -fopenmp")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3")# -fsanitize=address")
+target_compile_definitions(pogl PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
 
-if (NOT CMAKE_BUILD_TYPE)
-    message("No build type selected, default release")
-    set(CMAKE_BUILD_TYPE "Release")
-endif()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Test")
-    message("Test Mode")
-    add_executable(pogl)
-    target_sources(pogl PRIVATE "tests/main.cc" ${SRC})
-    target_link_libraries(pogl PRIVATE
-        ${LIBRARIES} 
-        ${OPENGL_LIBRARIES}
-        ${GLEW_LIBRARIES}
-        ${GLM_LIBRARIES}
-        ${GLFW_LIBRARIES}
-    )
-else()
-    add_executable(pogl)
-    target_sources(pogl PRIVATE "src/main.cc" ${SRC})
-    target_link_libraries(pogl PRIVATE
-        ${LIBRARIES} 
-        ${OPENGL_LIBRARIES}
-        ${GLEW_LIBRARIES}
-        ${GLM_LIBRARIES}
-        ${GLFW_LIBRARIES}
-    )
-endif()
+conan_target_link_libraries(pogl)

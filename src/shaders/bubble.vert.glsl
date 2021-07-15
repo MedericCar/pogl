@@ -14,6 +14,8 @@ uniform mat4 modelTransposeInv;
 uniform mat4 projection;
 uniform mat4 view;
 uniform float time;
+uniform float freq;
+uniform float amplitude;
 
 // Permutation array, repeated to avoid overflow
 int p[512] = {
@@ -147,9 +149,6 @@ void main()
   pos.xyz *= vec3(0.5);
   pos.xyz += vec3(0.5);
   pos.xy *= vec2(1024);
-
-  float freq = 0.05;
-  float amplitude = 0.05;
 
   maxDelta = amplitude;
   delta = noise(pos.x*freq, pos.y*freq, pos.z*time) * amplitude;

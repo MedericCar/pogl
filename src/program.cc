@@ -136,6 +136,12 @@ namespace pogl
     glUniform3fv(uniformId, 1, &value[0]);
   }
 
+  void Program::set_vec4(const std::string& name, const glm::vec4& value) 
+  {
+    GLint64 uniformId = glGetUniformLocation(id, name.c_str());
+    glUniform4fv(uniformId, 1, &value[0]);
+  }
+
   void Program::set_matrix4(const std::string& name, const glm::mat4& value) 
   {
     GLint64 uniformId = glGetUniformLocation(id, name.c_str());

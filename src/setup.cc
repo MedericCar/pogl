@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include <imgui.h>
+#include "../bindings/imgui_impl_opengl3.h"
+#include "../bindings/imgui_impl_glfw.h"
+
 #include "setup.hh"
 
 namespace pogl
@@ -116,7 +120,7 @@ GLFWwindow* initGLFW()
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
-  GLFWwindow* window = glfwCreateWindow(width, height, "LearnOpenGL", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(width, height, "Bob the Blob", NULL, NULL);
   if (window == NULL)
   {
       std::cout << "Failed to create GLFW window" << std::endl;
@@ -137,6 +141,19 @@ void initGL()
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
   glDebugMessageCallback(GLDebugMessageCallback, nullptr);
+}
+
+void init_ImGui(GLFWwindow* window)
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 450");
+
+    ImGui::StyleColorsDark();
 }
 
   

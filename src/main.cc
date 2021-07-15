@@ -5,8 +5,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include <imgui.h>
+#include "../bindings/imgui_impl_opengl3.h"
+#include "../bindings/imgui_impl_glfw.h"
 
 #include "program.hh"
 #include "setup.hh"
@@ -63,22 +64,47 @@ void init_sphere()
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); 
   glEnableVertexAttribArray(1); 
 
-  //glBindVertexArray(0); 
+  glBindVertexArray(0); 
 }
 
 void render(GLFWwindow* window, pogl::Program* program)
 {
+  glfwPollEvents();
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
+
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
+  ImGui::Begin("Parameters");
+  static float frequency = 0.001;
+  ImGui::SliderFloat("frequency", &frequency, 0.001, 0.1);
+  static float amplitude = 0.02;
+  ImGui::SliderFloat("amplitude", &amplitude, 0.01, 1);
+  //triangle_shader.setUniform("translation", translation[0], translation[1]);
+  // color picker
+  static glm::vec4 color1(1.0f, 1.0f, 1.0f, 1.0f);
+  ImGui::ColorEdit3("color1", &color1[0]);
+  static glm::vec4 color2(1.0f, 1.0f, 1.0f, 1.0f);
+  ImGui::ColorEdit3("color2", &color2[0]);
+  ImGui::End();
+
+  program->set_float("freq", frequency);
+  program->set_float("amplitude", amplitude);
+  program->set_vec4("color1", color1);
+  program->set_vec4("color2", color2);
+
   program->set_float("time", glfwGetTime());
   
   glBindVertexArray(VAO); 
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
-  //glBindVertexArray(0); 
+  glBindVertexArray(0); 
 
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  
   glfwSwapBuffers(window);
-  glfwPollEvents();
 }
 
 
@@ -86,6 +112,7 @@ int main(int argc, char** argv)
 {
   // Setup
   GLFWwindow* window = pogl::initGLFW();
+  pogl::init_ImGui(window);
 
   GLenum err = glewInit();
   if (err != GLEW_OK)
@@ -133,6 +160,11 @@ int main(int argc, char** argv)
   delete program;
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
+
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+    
 
   glfwTerminate();
   return 0;

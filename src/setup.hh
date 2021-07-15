@@ -18,5 +18,8 @@ namespace pogl
   GLFWwindow* initGLFW();
 
   void initGL();
+
+  void init_ImGui(GLFWwindow* window);
+
 }
 
