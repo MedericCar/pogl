@@ -5,6 +5,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
 #include "program.hh"
 #include "setup.hh"
 #include "sphere.hh"
@@ -20,13 +23,14 @@ glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 GLuint VBO;
 GLuint VAO;
 GLuint EBO;  //for indices
+GLuint texture;
 
 void init_sphere()
 {
   Point3 center(0, 0, 0);
   Sphere s(center, 1);
 
-  auto data = s.generate_vertices(100, 100);
+  auto data = s.generate_vertices(500, 500);
   vertices = data.first;
   indices = data.second;
 
@@ -40,7 +44,7 @@ void init_sphere()
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), 
-                 &indices[0], GL_STATIC_DRAW); 
+               &indices[0], GL_STATIC_DRAW); 
 
   // Vertex pos
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); 
@@ -51,6 +55,38 @@ void init_sphere()
   glEnableVertexAttribArray(1); 
 
   glBindVertexArray(0); 
+}
+
+void load_texture(const std::string& filename, pogl::Program* program)
+{
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  // Wrapping parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  // Filtering parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  // load image, create texture and generate mipmaps
+  int width, height, nrChannels;
+  //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+  unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+  if (data)
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    std::cout << "Loaded texture of shape : " << width << " " << height << std::endl;
+  }
+  else
+  {
+    std::cerr << "Failed to load texture." << std::endl;
+  }
+  stbi_image_free(data);
+
+  program->set_int("texture", 0);
 }
 
 void render(GLFWwindow* window, pogl::Program* program)
@@ -89,6 +125,9 @@ int main(int argc, char** argv)
   // Load sphere mesh to buffers
   init_sphere();
 
+  // Load gradient texture
+  load_texture("../resources/explosion.png", program);
+
   // Load transform matrices
   glm::mat4 model = glm::mat4(1.0f);
   glm::mat4 modelTransposeInv = glm::transpose(glm::inverse(model));
@@ -104,7 +143,7 @@ int main(int argc, char** argv)
   // Load view information
   glm::vec3 objectColor(1.0f, 0.0f, 0.0f);
   glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-  glm::vec3 lightPos(0.0f, 2.0f, 0.0f);
+  glm::vec3 lightPos(0.0f, 2.0f, 2.0f);
   program->set_vec3("objectColor", objectColor);
   program->set_vec3("lightColor", lightColor);
   program->set_vec3("lightPos", lightPos);
