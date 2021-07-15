@@ -12,6 +12,15 @@
 #include "setup.hh"
 #include "sphere.hh"
 
+#define TEST_OPENGL_ERROR()                                                             \
+  do {                                                                                  \
+    GLenum err = glGetError();                                                          \
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL ERROR: "                               \
+                                      << gluErrorString(err)                            \
+                                      << " file " << __FILE__                           \
+                                      << " line " << __LINE__ << std::endl;             \
+  } while(0)
+
 std::vector<float> vertices;
 std::vector<unsigned int> indices;
 
@@ -54,39 +63,7 @@ void init_sphere()
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); 
   glEnableVertexAttribArray(1); 
 
-  glBindVertexArray(0); 
-}
-
-void load_texture(const std::string& filename, pogl::Program* program)
-{
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  // Wrapping parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-  // Filtering parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  // load image, create texture and generate mipmaps
-  int width, height, nrChannels;
-  //stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-  unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-  if (data)
-  {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    std::cout << "Loaded texture of shape : " << width << " " << height << std::endl;
-  }
-  else
-  {
-    std::cerr << "Failed to load texture." << std::endl;
-  }
-  stbi_image_free(data);
-
-  program->set_int("texture", 0);
+  //glBindVertexArray(0); 
 }
 
 void render(GLFWwindow* window, pogl::Program* program)
@@ -98,7 +75,7 @@ void render(GLFWwindow* window, pogl::Program* program)
   
   glBindVertexArray(VAO); 
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0); 
-  glBindVertexArray(0); 
+  //glBindVertexArray(0); 
 
   glfwSwapBuffers(window);
   glfwPollEvents();
@@ -124,9 +101,6 @@ int main(int argc, char** argv)
 
   // Load sphere mesh to buffers
   init_sphere();
-
-  // Load gradient texture
-  load_texture("../resources/explosion.png", program);
 
   // Load transform matrices
   glm::mat4 model = glm::mat4(1.0f);

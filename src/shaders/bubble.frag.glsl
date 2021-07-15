@@ -14,8 +14,6 @@ uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform float time;
 
-uniform sampler2D texture;
-
 
 void main()
 {
@@ -27,10 +25,10 @@ void main()
     float spec = pow(max(dot(reflect(-lightDir, norm), viewDir), 0.0), 32);
 
     //FragColor = vec4((ambientStrength + diff + spec) * lightColor * vec3(1, 0, 0), 1.0);
-
-    int index = int((delta / maxDelta) * 128);
-    vec4 texColor = texture2D(texture, vec2(1, index));
-    FragColor = texColor;
+    vec3 color1 = vec3(1.0, 0.55, 0.0);
+    vec3 color2 = vec3(0.6157, 0.1216, 0.0);
+    vec3 color = mix(color1, color2, delta / maxDelta);
 
     //FragColor = vec4(delta / maxDelta, 0, 0, 1.0);
+    FragColor = vec4(color, 1.0);
 } 

@@ -149,7 +149,7 @@ void main()
   pos.xy *= vec2(1024);
 
   float freq = 0.05;
-  float amplitude = 0.2;
+  float amplitude = 0.05;
 
   maxDelta = amplitude;
   delta = noise(pos.x*freq, pos.y*freq, pos.z*time) * amplitude;
