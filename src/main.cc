@@ -153,29 +153,27 @@ void render(GLFWwindow* window, std::vector<pogl::Program*> programs)
 
   //Reset time
   if (prev != curr_effect)
+  {
     glfwSetTime(0);
+    prev = curr_effect;
+  }
 
   switch (curr_effect)
   {
   case 0:
     render_wave(window, programs[0]);
-    prev = 0;
     break;
   case 1:
     render_blob(window, programs[1]);
-    prev = 1;
     break;
   case 2:
     render_morphing(window, programs[2]);
-    prev = 2;
     break;
   case 3:
     render_laser(window, programs[3]);
-    prev = 3;
     break;
   case 4:
     render_random(window, programs[4]);
-    prev = 4;
     break;
   default:
     break;
