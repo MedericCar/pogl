@@ -85,7 +85,9 @@ void init_sphere()
 
 void render_wave(GLFWwindow* window, pogl::Program* program)
 {
+  program->use();
 
+  program->set_float("time", glfwGetTime());
 }
 
 void render_blob(GLFWwindow* window, pogl::Program* program)
@@ -110,17 +112,23 @@ void render_blob(GLFWwindow* window, pogl::Program* program)
 
 void render_morphing(GLFWwindow* window, pogl::Program* program)
 {
+  program->use();
 
+  program->set_float("time", glfwGetTime());
 }
 
 void render_laser(GLFWwindow* window, pogl::Program* program)
 {
+  program->use();
 
+  program->set_float("time", glfwGetTime());
 }
 
 void render_random(GLFWwindow* window, pogl::Program* program)
 {
+  program->use();
 
+  program->set_float("time", glfwGetTime());
 }
 
 void render(GLFWwindow* window, std::vector<pogl::Program*> programs)
@@ -135,25 +143,36 @@ void render(GLFWwindow* window, std::vector<pogl::Program*> programs)
 
   ImGui::Begin("Parameters");
   const char* effects[5] = { "Wave", "Blob", "Morphing", "Laser", "Random"};
+  static int prev = -1;
   static int curr_effect = 0;
-  ImGui::ListBox("Effects", &curr_effect, effects, 5, 2);
+  ImGui::ListBox("Effects", &curr_effect, effects, 5, 5);
   ImGui::BeginChild("Effects");
+
+  //Reset time
+  if (prev != curr_effect)
+    glfwSetTime(0);
+
   switch (curr_effect)
   {
   case 0:
     render_wave(window, programs[0]);
+    prev = 0;
     break;
   case 1:
     render_blob(window, programs[1]);
+    prev = 1;
+    break;
+  case 2:
+    render_morphing(window, programs[2]);
+    prev = 2;
     break;
   case 3:
-    render_morphing(window, programs[2]);
+    render_laser(window, programs[3]);
+    prev = 3;
     break;
   case 4:
-    render_laser(window, programs[3]);
-    break;
-  case 5:
     render_random(window, programs[4]);
+    prev = 4;
     break;
   default:
     break;
