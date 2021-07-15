@@ -26,7 +26,7 @@ void init_sphere()
   Point3 center(0, 0, 0);
   Sphere s(center, 1);
 
-  auto data = s.generate_vertices(80, 80);
+  auto data = s.generate_vertices(100, 100);
   vertices = data.first;
   indices = data.second;
 

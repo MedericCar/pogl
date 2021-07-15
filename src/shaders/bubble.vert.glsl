@@ -112,5 +112,5 @@ void main()
   FragPos = vec3(model * vec4(aPos, 1.0));
   float n = noise(FragPos.x, FragPos.y, FragPos.z);
   Normal = mat3(modelTransposeInv) * aNormal;
-  gl_Position = projection * view * vec4(FragPos + vec3(sin(n*time)), 1.0);
+  gl_Position = projection * view * vec4(FragPos, 1.0);
 }
