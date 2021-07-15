@@ -2,6 +2,10 @@
 
 Implementation of various effects on a sphere in OpenGL.
 
+## Authors
+Médéric Carriat
+Xavier Gomez
+
 ## Installation
 
 ### Dependencies
@@ -13,7 +17,7 @@ Implementation of various effects on a sphere in OpenGL.
 ```bash
 $ mkdir build
 $ cd build
-$ conan install .. -s build_type=Release 
+$ conan install .. -s build_type=Release --build missing
 $ cmake .. -DCMAKE_BUILD_TYPE=Release
 $ make
 $ ./pogl
